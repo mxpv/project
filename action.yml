@@ -20,8 +20,8 @@ runs:
       shell: bash
       env:
         GO111MODULE: off
-        GOBIN: ${{ github.action_path }}/bin
       run: |
+        echo "::debug::Getting dependencies"
         go get -u github.com/vbatts/git-validation
         go get -u github.com/kunalkushwaha/ltag
         go get -u github.com/LK4D4/vndr
