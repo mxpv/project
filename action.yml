@@ -7,6 +7,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Set env
+      shell: bash
+      run: |
+        echo "GOPATH=${{ github.workspace }}" >> $GITHUB_ENV
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+
     #
     # Go get dependencies
     #
@@ -20,10 +26,6 @@ runs:
         go get -u github.com/kunalkushwaha/ltag
         go get -u github.com/LK4D4/vndr
 
-    - name: Set env
-      shell: bash
-      run: echo "${{ github.action_path }}/bin" >> $GITHUB_PATH
-
     #
     # DCO
     #
@@ -35,6 +37,7 @@ runs:
         DCO_VERBOSITY: "-q"
         DCO_RANGE: ""
       run: |
+        echo "::debug::Running DCO checks"
         set -x
         if [ -z "${GITHUB_COMMIT_URL}" ]; then
         DCO_RANGE=$(jq -r '.after + "..HEAD"' ${GITHUB_EVENT_PATH})
@@ -50,6 +53,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
+        echo "::debug::Checking file headers"
         ${{ github.action_path }}/script/validate/fileheader ${{ github.action_path }}/
 
     #
@@ -59,5 +63,5 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        export PATH=$PATH:${{ github.action_path }}/bin
+        echo "::debug::Validating vendor directory"
         ${{ github.action_path }}/script/validate/vendor
